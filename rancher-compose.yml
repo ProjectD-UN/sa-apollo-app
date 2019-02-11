@@ -58,7 +58,7 @@ services:
         priority: 1
         protocol: http
         service: sa-apollo-wa
-        source_port: 4200
+        source_port: 4201
         target_port: 4200
     health_check:
       healthy_threshold: 2
