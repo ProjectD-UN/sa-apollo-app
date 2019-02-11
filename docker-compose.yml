@@ -31,6 +31,8 @@ services:
     expose:
       - '5000'
     labels:
+      io.rancher.scheduler.global: 'true'
+      io.rancher.scheduler.affinity:host_label_ne: noapi=true
       io.rancher.container.pull_image: always
   sa-user-db:
     container_name: sa-user-db
