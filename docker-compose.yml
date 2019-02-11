@@ -83,6 +83,7 @@ services:
     expose:
       - '3003'
     labels:
+      io.rancher.scheduler.global: 'true'
       io.rancher.container.pull_image: always
   sa-news-ms:
     container_name: sa-news-ms
@@ -113,6 +114,7 @@ services:
     expose:
       - '3001'
     labels:
+      io.rancher.scheduler.global: 'true'
       io.rancher.scheduler.affinity:host_label: hostdb=true
       io.rancher.container.pull_image: always
   sa-apollo-wa:
