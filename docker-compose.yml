@@ -32,7 +32,6 @@ services:
       - '5000'
     labels:
       io.rancher.container.pull_image: always
-      io.rancher.scheduler.affinity:host_label: hostproxy=true
   sa-user-db:
     container_name: sa-user-db
     image: mongo
@@ -122,7 +121,6 @@ services:
     expose:
       - '4200' 
     labels:
-      io.rancher.scheduler.affinity:host_label_ne: nofront=true
       io.rancher.container.pull_image: always
   sa-apolloapi-lb:
     image: rancher/lb-service-haproxy:v0.9.6
