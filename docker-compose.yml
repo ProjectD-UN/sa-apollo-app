@@ -102,6 +102,7 @@ services:
     expose:
       - '3002'
     labels:
+      io.rancher.scheduler.global: 'true'
       io.rancher.scheduler.affinity:host_label: hostdb=true
       io.rancher.container.pull_image: always
   sa-centers-ms:
