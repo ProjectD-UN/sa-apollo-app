@@ -137,7 +137,7 @@ services:
   sa-apollowa-lb:
     image: rancher/lb-service-haproxy:v0.9.6
     ports:
-      - 4200:4200/tcp
+      - 4201:4201/tcp
     labels:
       io.rancher.scheduler.affinity:host_label: hostproxy=true
       io.rancher.container.agent.role: environmentAdmin,agent
