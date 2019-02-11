@@ -1,0 +1,145 @@
+version: '2'
+services:
+  sa-apollo-proxy: 
+    container_name: sa-apollo-proxy
+    image: diefrodriguezcha/sa_apollo_proxy:latest
+    depends_on:
+      - sa-apollo-api
+    ports:
+      - 80:80
+    labels:
+        io.rancher.container.pull_image: always
+        io.rancher.scheduler.affinity:host_label: hostproxy=true
+  sa-apollo-api:
+    container_name: sa-apollo-api
+    image: diefrodriguezcha/sa-apollov2-api:latest
+    environment:
+      PORT: '5000'
+      SHOW_URLS: 'true'
+      CENTERS_URL: 'sa-centers-ms'
+      CENTERS_ENTRY: 'courses-ms/resources/courses'
+      CENTERS_PORT: '3001'
+      NEWSLETTERS_URL: 'sa-news-ms'
+      NEWSLETTERS_PORT: '3002'
+      USERS_URL: 'sa-user-ms'
+      USERS_ENTRY: 'api/auth'
+      USERS_PORT: '3003'
+    links:
+      - sa-centers-ms
+      - sa-user-ms
+      - sa-news-ms
+    expose:
+      - '5000'
+    labels:
+      io.rancher.container.pull_image: always
+      io.rancher.scheduler.affinity:host_label: hostproxy=true
+  sa-user-db:
+    container_name: sa-user-db
+    image: mongo
+    ports:
+      - 27017:27017
+    labels:
+      io.rancher.container.pull_image: always
+      io.rancher.scheduler.affinity:host_label: hostproxy=true
+  sa-news-db:
+    container_name: sa-news-db
+    image: mysql:5.7
+    environment:
+      MYSQL_DATABASE: railsapp
+      MYSQL_PASSWORD: password
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_USER: appuser
+    ports:
+      - 3306:3306
+    labels:
+      io.rancher.scheduler.affinity:host_label: hostdb=true
+      io.rancher.container.pull_image: always
+  courses-db:
+    container_name: courses-db
+    image: mysql:5.7
+    environment:
+      MYSQL_DATABASE: courses-db
+      MYSQL_PASSWORD: '123'
+      MYSQL_ROOT_PASSWORD: '123'
+      MYSQL_USER: sa
+    ports:
+      - 3307:3306
+    labels:
+      io.rancher.scheduler.affinity:host_label: hostdb=true
+      io.rancher.container.pull_image: always
+  sa-user-ms:
+    container_name: sa-user-ms
+    image: diefrodriguezcha/sa_user_ms
+    environment:
+      DATABASE: '27017'
+      DOCKER_DEPLOY: 'true'
+      LDAP: '35.196.42.82'
+      LDAP_PORT: '389'
+      PORT: '3003'
+      SECRET: arquisoft
+    depends_on:
+      - sa-user-db
+    links:
+      - sa-user-db
+    expose:
+      - '3003'
+    labels:
+      io.rancher.container.pull_image: always
+  sa-news-ms:
+    container_name: sa-news-ms
+    image: menoguera/newsletter-api
+    command: bundle exec rails s -p 3002 -b '0.0.0.0'
+    environment:
+      DB_HOST: sa-news-db
+      DB_NAME: railsapp
+      DB_PASSWORD: password
+      DB_USER: root
+      PORT: '3002'
+    depends_on:
+      - sa-news-db
+    links:
+      - sa-news-db
+    expose:
+      - '3002'
+    labels:
+      io.rancher.scheduler.affinity:host_label_ne: nnews=true
+      io.rancher.container.pull_image: always
+  sa-centers-ms:
+    container_name: sa-centers-ms
+    image: dulfrey/sa_centers_ms
+    depends_on:
+      - courses-db
+    links:
+      - courses-db
+    expose:
+      - '3001'
+    labels:
+      io.rancher.container.pull_image: always
+  sa-apollo-wa:
+    image: menoguera/sa-front-web 
+    command: 'npm start'
+    ports:
+      - '4200:4200' 
+    expose:
+      - '4200' 
+    labels:
+      io.rancher.scheduler.affinity:host_label_ne: nofront=true
+      io.rancher.container.pull_image: always
+  sa-apolloapi-lb:
+    image: rancher/lb-service-haproxy:v0.9.6
+    ports:
+    - 5000:5000/tcp
+    labels:
+      io.rancher.scheduler.affinity:host_label: hostproxy=true
+      io.rancher.container.agent.role: environmentAdmin,agent
+      io.rancher.container.agent_service.drain_provider: 'true'
+      io.rancher.container.create_agent: 'true'
+  sa-apollowa-lb:
+    image: rancher/lb-service-haproxy:v0.9.6
+    ports:
+    - 4200:4200/tcp
+    labels:
+      io.rancher.scheduler.affinity:host_label: hostproxy=true
+      io.rancher.container.agent.role: environmentAdmin,agent
+      io.rancher.container.agent_service.drain_provider: 'true'
+      io.rancher.container.create_agent: 'true'    
