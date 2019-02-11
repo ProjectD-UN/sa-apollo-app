@@ -113,6 +113,7 @@ services:
     expose:
       - '3001'
     labels:
+      io.rancher.scheduler.affinity:host_label: hostdb=true
       io.rancher.container.pull_image: always
   sa-apollo-wa:
     image: menoguera/sa-front-web 
@@ -122,6 +123,7 @@ services:
     expose:
       - '4200' 
     labels:
+      io.rancher.scheduler.affinity:host_label_ne: nofront=true
       io.rancher.container.pull_image: always
   sa-apolloapi-lb:
     image: rancher/lb-service-haproxy:v0.9.6
