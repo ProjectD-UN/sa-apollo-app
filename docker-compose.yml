@@ -120,13 +120,11 @@ services:
       io.rancher.scheduler.global: 'true'
       io.rancher.scheduler.affinity:host_label: hostdb=true
       io.rancher.container.pull_image: always
-  sa-apollo-wa:
-    image: menoguera/sa-front-web 
-    command: 'npm start'
+  sa-front-wa:
+    image: menoguera/sa-front-web
+    command: 'ng serve --port 4200 --host 0.0.0.0'
     ports:
-      - '4200:4200' 
-    expose:
-      - '4200' 
+      - '4200:4200'
     labels:
       io.rancher.scheduler.affinity:host_label_ne: nofront=true
       io.rancher.container.pull_image: always
