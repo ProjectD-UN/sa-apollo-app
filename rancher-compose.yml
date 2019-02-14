@@ -36,7 +36,7 @@ services:
   sa-apollo-api:
     scale: 3
     start_on_create: true
-  sa-apollo-wa:
+  sa-front-wa:
     scale: 3
     start_on_create: true
   sa-apolloapi-lb:
