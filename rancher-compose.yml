@@ -69,7 +69,7 @@ services:
       - path: ''
         priority: 1
         protocol: http
-        service: sa-apollo-wa
+        service: sa-front-wa
         source_port: 4201
         target_port: 4200
     health_check:
