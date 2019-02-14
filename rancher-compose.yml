@@ -21,6 +21,18 @@ services:
   sa-apollo-proxy:
     scale: 1
     start_on_create: true
+  sa-phpldapadmin-ms:
+    scale: 1
+    start_on_create: true
+  sa-apollo-ldap:
+    scale: 1
+    start_on_create: true
+  sa-bot-db:
+    scale: 1
+    start_on_create: true
+  sa-bot-ms:
+    scale: 3
+    start_on_create: true
   sa-apollo-api:
     scale: 3
     start_on_create: true

@@ -147,4 +147,76 @@ services:
       io.rancher.scheduler.affinity:host_label: hostproxy=true
       io.rancher.container.agent.role: environmentAdmin,agent
       io.rancher.container.agent_service.drain_provider: 'true'
-      io.rancher.container.create_agent: 'true'    
+      io.rancher.container.create_agent: 'true' 
+  sa-phpldapadmin-ms:
+    image: osixia/phpldapadmin:latest
+    environment:
+      PHPLDAPADMIN_HTTPS: 'false'
+      PHPLDAPADMIN_LDAP_HOSTS: sa-apollo-ldap
+    links:
+      - sa-apollo-ldap:sa-apollo-ldap
+    ports:
+      - 8085:80/tcp
+    labels:
+      io.rancher.container.pull_image: always
+      io.rancher.scheduler.affinity:host_label: hostproxy=true
+  sa-apollo-ldap:
+    image: osixia/openldap:1.1.8
+    hostname: apollo.org
+    environment:
+      COMPOSE_HTTP_TIMEOUT: '200'
+      LDAP_ADMIN_PASSWORD: admin
+      LDAP_BACKEND: hdb
+      LDAP_BASE_DN: ''
+      LDAP_CONFIG_PASSWORD: config
+      LDAP_DOMAIN: apollo.unal.edu.co
+      LDAP_LOG_LEVEL: '256'
+      LDAP_ORGANISATION: Apollo UN
+      LDAP_READONLY_USER: 'false'
+      LDAP_REMOVE_CONFIG_AFTER_SETUP: 'true'
+      LDAP_REPLICATION: 'false'
+      LDAP_SSL_HELPER_PREFIX: ldap
+      LDAP_TLS: 'true'
+      LDAP_TLS_CA_CRT_FILENAME: ca.crt
+      LDAP_TLS_CIPHER_SUITE: SECURE256:-VERS-SSL3.0
+      LDAP_TLS_CRT_FILENAME: ldap.crt
+      LDAP_TLS_ENFORCE: 'false'
+      LDAP_TLS_KEY_FILENAME: ldap.key
+      LDAP_TLS_PROTOCOL_MIN: '3.1'
+      LDAP_TLS_VERIFY_CLIENT: demand
+    stdin_open: true
+    volumes:
+      - /container/service/slapd/assets/certs/
+      - /etc/ldap/slapd.d
+      - /var/lib/ldap
+    tty: true
+    ports:
+      - 389:389/tcp
+      - 636:636/tcp
+    labels:
+      io.rancher.container.pull_image: always
+      io.rancher.scheduler.affinity:host_label: hostproxy=true
+  sa-bot-db:
+    image: mongo
+    ports:
+      - 27027:27027/tcp
+    command:
+      - mongod
+      - --port
+      - '27027'
+    labels:
+      io.rancher.container.pull_image: always
+      io.rancher.scheduler.affinity:host_label: hostproxy=true
+  sa-bot-ms:
+    image: diefrodriguezcha/sa_bot_ms:latest
+    environment:
+      DATABASE: '27027'
+      DOCKER_DEPLOY: 'true'
+      PORT: '3000'
+    links:
+      - sa-bot-db:sa-bot-db
+    ports:
+      - 3000:80/tcp  
+    labels:
+      io.rancher.scheduler.global: 'true'
+      io.rancher.container.pull_image: always
